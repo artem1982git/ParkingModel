@@ -77,9 +77,8 @@ class PlaceController {  //класс для формирования связа
     }
 }
 
+
 public class ParkingController { //контроллер парковки
-
-
 
 
     PlaceController lastSmallFreePlace = null; //последнее свободное маленькое место
@@ -87,26 +86,28 @@ public class ParkingController { //контроллер парковки
     PlaceController lastBigFreePlace = null; //последнее свободное большое место
 
 
-
     private ArrayList<PlaceController> placeList = new ArrayList<>(); //массив в ячейках которого контроллер (скорее модель) парковчного места. Элементы массива образуют два связанных списка
 
-    private ArrayList<TakedPlaceParam> busyPlacesList=new ArrayList<>(); //массив с занятыми парковычными местами
+    private ArrayList<TakedPlaceParam> busyPlacesList = new ArrayList<>(); //массив с занятыми парковычными местами
 
 
-    public void addCar(CarModel car){ //добавление новой машины
-       var takedPlaceParam = parkCar(car);
-       if (takedPlaceParam!=null){
-           takedPlaceParam.setCar(car);
-           busyPlacesList.add(takedPlaceParam);
-       }
+    public void addCar(CarModel car) { //добавление новой машины
+        var takedPlaceParam = parkCar(car);
+        if (takedPlaceParam != null) {
+            takedPlaceParam.setCar(car);
+            busyPlacesList.add(takedPlaceParam);
+        }
 
     }
 
-    public void parkingWorking(){ //обход занятых мест
-        int y=busyPlacesList.size();
-        for (int x=0;x<y;x++){
-            if (busyPlacesList.get(x).getCar().isLeaving()){
-                System.out.println("Car leaved away");
+    public void parkingWorking() { //обход занятых мест
+        int y = busyPlacesList.size();
+        for (int x = 0; x < y; x++) {
+            if (busyPlacesList.get(x).getCar().isLeaving()) {
+                if (busyPlacesList.get(x).getCar().getSize()==Size.small)
+                System.out.println(  " Small leaved away");
+                if (busyPlacesList.get(x).getCar().getSize()==Size.big)
+                    System.out.println(  " Big leaved away");
                 relasePlace(busyPlacesList.get(x));
                 busyPlacesList.remove(x);
                 y--;
@@ -117,19 +118,19 @@ public class ParkingController { //контроллер парковки
     }
 
 
-    private void relasePlace(TakedPlaceParam tpm){ //освободить парковчное место
-        if (tpm.placeType==TakedPlace.big){
-           placeList.get(tpm.placeNumber).parkingPlace.busy=Busy.free;
-           addBigPlace(tpm.placeNumber); //пихаем в стек
+    private void relasePlace(TakedPlaceParam tpm) { //освободить парковчное место
+        if (tpm.placeType == TakedPlace.big) {
+            placeList.get(tpm.placeNumber).parkingPlace.busy = Busy.free;
+            addBigPlace(tpm.placeNumber); //пихаем в стек
         }
-        if (tpm.placeType==TakedPlace.twosmall){
-            placeList.get(tpm.placeNumber).parkingPlace.busy=Busy.free;
-            placeList.get(tpm.placeNumber+1).parkingPlace.busy=Busy.free;
+        if (tpm.placeType == TakedPlace.twosmall) {
+            placeList.get(tpm.placeNumber).parkingPlace.busy = Busy.free;
+            placeList.get(tpm.placeNumber + 1).parkingPlace.busy = Busy.free;
             addSmallPace(tpm.placeNumber);//пихаем в стек
-            addSmallPace(tpm.placeNumber+1);//пихаем в стек
+            addSmallPace(tpm.placeNumber + 1);//пихаем в стек
         }
-        if (tpm.placeType==TakedPlace.onesmall){
-            placeList.get(tpm.placeNumber).parkingPlace.busy=Busy.free;
+        if (tpm.placeType == TakedPlace.onesmall) {
+            placeList.get(tpm.placeNumber).parkingPlace.busy = Busy.free;
             addSmallPace(tpm.placeNumber);//пихаем в стек
 
         }
@@ -138,35 +139,31 @@ public class ParkingController { //контроллер парковки
     }
 
 
-
-    private void addBigPlace(int x){ //типа ошибок нет и место точно занято большой машиной. Добавляем большое место в стек с большими местами
-            if (lastBigFreePlace == null) { //если стек пустой
-                lastBigFreePlace = placeList.get(x);
-                lastBigFreePlace.clearLinks();//на всякий случай
-                return;
-            }
-            lastBigFreePlace.setNextFreePlace(placeList.get(x));
-            placeList.get(x).setPrevFreePlace(lastBigFreePlace);
+    private void addBigPlace(int x) { //типа ошибок нет и место точно занято большой машиной. Добавляем большое место в стек с большими местами
+        if (lastBigFreePlace == null) { //если стек пустой
             lastBigFreePlace = placeList.get(x);
+            lastBigFreePlace.clearLinks();//на всякий случай
+            return;
+        }
+        lastBigFreePlace.setNextFreePlace(placeList.get(x));
+        placeList.get(x).setPrevFreePlace(lastBigFreePlace);
+        lastBigFreePlace = placeList.get(x);
 
 
     }
 
-    private void addSmallPace(int x){ // аналогично addBigPlace
+    private void addSmallPace(int x) { // аналогично addBigPlace
 
-            if (lastSmallFreePlace == null) {
-                lastSmallFreePlace = placeList.get(x);
-                lastSmallFreePlace.clearLinks();//на всякий случай
-                 return;
-            }
-            lastSmallFreePlace.setNextFreePlace(placeList.get(x));
-            placeList.get(x).setPrevFreePlace(lastSmallFreePlace);
+        if (lastSmallFreePlace == null) {
             lastSmallFreePlace = placeList.get(x);
-
+            lastSmallFreePlace.clearLinks();//на всякий случай
+            return;
         }
+        lastSmallFreePlace.setNextFreePlace(placeList.get(x));
+        placeList.get(x).setPrevFreePlace(lastSmallFreePlace);
+        lastSmallFreePlace = placeList.get(x);
 
-
-
+    }
 
 
     public void creteCustomParking(ParkingCreationOrder creator, int addSize) { // позволяет наращивать парковку кусками по закону creator
@@ -174,20 +171,20 @@ public class ParkingController { //контроллер парковки
         if (addSize < 1) {
             return;
         }
-        int size=placeList.size();
+        int size = placeList.size();
         for (int x = size; x < size + addSize; x++) {
             Size placeSize = creator.sizeCreator();
 
-            placeList.add(new PlaceController(new ParkingPlace(x,placeSize)));
+            placeList.add(new PlaceController(new ParkingPlace(x, placeSize)));
 
             if (placeSize == Size.big) { //создаем связанный список больших мест с которым будем потом работать как со стеком
-                System.out.println("PLACE BIIIIIIIIIG "+ x+"\n");
+                //  System.out.println("PLACE BIIIIIIIIIG "+ x+"\n");
 
                 addBigPlace(x);
                 //continue;
             }
             if (placeSize == Size.small) { //создаем связанный список малых мест
-                System.out.println("PLACE SMAAAAAAAAAAAAAL "+ x+"\n");
+                //   System.out.println("PLACE SMAAAAAAAAAAAAAL "+ x+"\n");
                 addSmallPace(x);
             }
         }
@@ -199,7 +196,7 @@ public class ParkingController { //контроллер парковки
             return -1; //все места заняты
         }
         int freeNumber = lastBigFreePlace.parkingPlace.number;
-        if (lastBigFreePlace.prevFreePlace==null && lastBigFreePlace.getNextFreePlace()==null) { //осталось одно место
+        if (lastBigFreePlace.prevFreePlace == null && lastBigFreePlace.getNextFreePlace() == null) { //осталось одно место
             lastBigFreePlace.clearLinks();
             lastBigFreePlace = null;
             return freeNumber;
@@ -213,80 +210,57 @@ public class ParkingController { //контроллер парковки
 
 
     private int getSmallPlace() { //аналогично
-        if (lastSmallFreePlace==null ) {
+        if (lastSmallFreePlace == null) {
             return -1; //все места заняты
         }
         int freeNumber = lastSmallFreePlace.parkingPlace.number;
-        if (lastSmallFreePlace.getPrevFreePlace() == null && lastSmallFreePlace.getNextFreePlace()==null) { //осталось одно место
+        if (lastSmallFreePlace.getPrevFreePlace() == null && lastSmallFreePlace.getNextFreePlace() == null) { //осталось одно место
             lastSmallFreePlace.clearLinks();
             lastSmallFreePlace = null;
             return freeNumber; //все места заняты
         }
 
+//        lastSmallFreePlace.getPrevFreePlace().setNextFreePlace(lastSmallFreePlace);// костыль
         lastSmallFreePlace = lastSmallFreePlace.getPrevFreePlace();
         lastSmallFreePlace.getNextFreePlace().clearLinks();
         lastSmallFreePlace.setNextFreePlace(null);
-        System.out.println(freeNumber+"\n");
+        // System.out.println(freeNumber+"\n");
         return freeNumber;
     }
 
 
     private int getPairSmallPlaces() { // ищем пару свободных мест.
 
-        if (lastSmallFreePlace == null) { // нет мест
-            return -1;
-        }
-
-        if (lastSmallFreePlace.getPrevFreePlace() == null) { // одно место
-            return -1;
-        }
-
-        if (lastSmallFreePlace.getPrevFreePlace().getPrevFreePlace() == null) { // всего два свободных места
-           int fNumber = lastSmallFreePlace.parkingPlace.number;
-           int lNumber = lastSmallFreePlace.getPrevFreePlace().parkingPlace.number;
-           if (Math.abs(fNumber-lNumber)==1){//если  они соседи
-               lastSmallFreePlace.getPrevFreePlace().clearLinks();
-               lastSmallFreePlace.clearLinks();
-               lastSmallFreePlace=null;
-                if (fNumber<lNumber) {  //контролируем чтобы нумерация была слева направо (либо нужно создать отдельную переменную для контроля )
-                   return fNumber;
-                }
-                   return lNumber;
-           } else {
-               return -1;
-           }
-
-        }
-
         PlaceController tmpPlace = lastSmallFreePlace;
 
-        while (tmpPlace.getPrevFreePlace() != null) {
+        while (tmpPlace != null) {
             int tmpNumber = tmpPlace.parkingPlace.number;
-            System.out.println(tmpNumber+"\n");
+            //  System.out.println(tmpNumber+"\n");
             if (tmpNumber < placeList.size() - 1 && placeList.get(tmpNumber + 1).parkingPlace.size == Size.small && placeList.get(tmpNumber + 1).parkingPlace.busy == Busy.free) { //соседнее место справа свободно
-                  TempPlaceController tempPlaceController=new TempPlaceController();
-                  removeFromList( tempPlaceController, tmpPlace) ;
-                  removeFromList(tempPlaceController, placeList.get(tmpNumber + 1));
-                  if(tempPlaceController.changed) {
-                      lastSmallFreePlace = tempPlaceController.getTpc();
-                  }
+                TempPlaceController tempPlaceController = new TempPlaceController();
+                removeFromList(tempPlaceController, tmpPlace);
+                removeFromList(tempPlaceController, placeList.get(tmpNumber + 1));
+                if (tempPlaceController.changed) {
+                    lastSmallFreePlace = tempPlaceController.getTpc();
+
+                }
 
 
-
-              return tmpNumber;
+                return tmpNumber;
             }
 
             if (tmpNumber > 0 && placeList.get(tmpNumber - 1).parkingPlace.size == Size.small && placeList.get(tmpNumber - 1).parkingPlace.busy == Busy.free) { //соседнее место слево свободно
-                TempPlaceController tempPlaceController=new TempPlaceController();
-                removeFromList( tempPlaceController, tmpPlace);
+                TempPlaceController tempPlaceController = new TempPlaceController();
+                removeFromList(tempPlaceController, tmpPlace);
                 removeFromList(tempPlaceController, placeList.get(tmpNumber - 1));
-                if(tempPlaceController.changed) {
+                if (tempPlaceController.changed) {
                     lastSmallFreePlace = tempPlaceController.getTpc();
+
                 }
-            
+
                 return tmpNumber - 1;
             }
-            tmpPlace=tmpPlace.getPrevFreePlace();
+            tmpPlace = tmpPlace.getPrevFreePlace();
         }
         return -1;
     }
@@ -295,87 +269,90 @@ public class ParkingController { //контроллер парковки
         if (car.getSize() == Size.big) {
             int num = getBigPlace();
             if (num >= 0) {
-                placeList.get(num).parkingPlace.busy=Busy.busyWithBig;
-                System.out.println("Busy  Big ok\n");
+                placeList.get(num).parkingPlace.busy = Busy.busyWithBig;
+                //  System.out.println("Busy  Big ok\n");
                 return new TakedPlaceParam(TakedPlace.big, num);
             }
-            System.out.println("No big place\n");
+            //   System.out.println("No big place\n");
             num = getPairSmallPlaces();
             if (num >= 0) {
-                placeList.get(num).parkingPlace.busy=Busy.busyWithBig;
-                placeList.get(num+1).parkingPlace.busy=Busy.busyWithBig;
-                System.out.println("Busy  two small ok\n");
+                placeList.get(num).parkingPlace.busy = Busy.busyWithBig;
+                placeList.get(num + 1).parkingPlace.busy = Busy.busyWithBig;
+                //   System.out.println("Busy  two small ok\n");
                 return new TakedPlaceParam(TakedPlace.twosmall, num);
             }
-            System.out.println("No two small place\n");
+            //    System.out.println("No two small place\n");
             return null;
         }
         if (car.getSize() == Size.small) {
             int num = getSmallPlace();
             if (num >= 0) {
-                System.out.println("Busy  one small ok   "+ num+"       \n");
-                placeList.get(num).parkingPlace.busy=Busy.busyWithSmall;
+                //  System.out.println("Busy  one small ok   "+ num+"       \n");
+                placeList.get(num).parkingPlace.busy = Busy.busyWithSmall;
                 return new TakedPlaceParam(TakedPlace.onesmall, num);
             }
         }
-        System.out.println("No place\n");
+        //  System.out.println("No place\n");
         return null;
     }
 
 
-
-
-
-
-//функция для выкидывания элемена из списка
-    private void removeFromList( TempPlaceController tempPlaceController,PlaceController actualPlace){
-        if (actualPlace.getPrevFreePlace()==null && actualPlace.getNextFreePlace()!=null){ //начало списка
+    //функция для выкидывания элемена из списка
+    private void removeFromList(TempPlaceController tempPlaceController, PlaceController actualPlace) {
+        if (actualPlace.getPrevFreePlace() == null && actualPlace.getNextFreePlace() != null) { //начало списка
             actualPlace.getNextFreePlace().setPrevFreePlace(null);
-            tempPlaceController.setTpc(actualPlace.getNextFreePlace());
-            tempPlaceController.changed=true;
             actualPlace.clearLinks();
-            return ;
+            return;
         }
-        if (actualPlace.getNextFreePlace()==null && actualPlace.getPrevFreePlace()!=null) {
+        if (actualPlace.getNextFreePlace() == null && actualPlace.getPrevFreePlace() != null) {
             //конец списка
             actualPlace.getPrevFreePlace().setNextFreePlace(null);
             tempPlaceController.setTpc(actualPlace.getPrevFreePlace());
-            tempPlaceController.changed=true;
+            tempPlaceController.changed = true;
             actualPlace.clearLinks();
-            return ;
+            return;
         }
-        if (actualPlace.getNextFreePlace()!=null && actualPlace.getPrevFreePlace()!=null){
+        if (actualPlace.getNextFreePlace() != null && actualPlace.getPrevFreePlace() != null) {
             actualPlace.getPrevFreePlace().setNextFreePlace(actualPlace.getNextFreePlace());
             actualPlace.getNextFreePlace().setPrevFreePlace(actualPlace.getPrevFreePlace());
             actualPlace.clearLinks();
-            return ;
+            return;
 
         }
-        if (actualPlace.getNextFreePlace()==null && actualPlace.getPrevFreePlace()==null){
+        if (actualPlace.getNextFreePlace() == null && actualPlace.getPrevFreePlace() == null) {
             tempPlaceController.setTpc(null);
-            tempPlaceController.changed=true;
-            return ;
+            tempPlaceController.changed = true;
+            return;
         }
 
 
     }
 
+    public TestProvider calcPlaces() {
+        PlaceController tmpSmallContLink = lastSmallFreePlace;
+        PlaceController tmpBigContLink = lastBigFreePlace;
+        var testProvider = new TestProvider();
+        if (tmpSmallContLink != null) {
+           while (tmpSmallContLink != null) {
+                testProvider.freeSmallQuiantity++;
+                tmpSmallContLink=tmpSmallContLink.getPrevFreePlace();
+            }
+        }
+        if (tmpBigContLink != null) {
+             while (tmpBigContLink != null) {
+                testProvider.freeBigQuiantity++;
+                tmpBigContLink=tmpBigContLink.getPrevFreePlace();
+            }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        }
+        int busyQuan=0;
+        for (int x=0;x<placeList.size();x++){
+            if (placeList.get(x).parkingPlace.busy!=Busy.free){
+                busyQuan++;
+            }
+        }
+        testProvider.busyQuantity=busyQuan;
+        testProvider.placeQuiantity=placeList.size();
+        return testProvider;
+    }
 }
-
-

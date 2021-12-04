@@ -18,18 +18,27 @@
 
 public class MainClass {
     public static void main(String[] args) {
+        int P=50;
         ParkingController parkingController = new ParkingController();
-        parkingController.creteCustomParking(new SizeCreator(), 50);
+        parkingController.creteCustomParking(new SizeCreator(), P);
         int N=10000000;// количество дискрет когда может приехать машина
         for (int x = 0; x < N; x++) {
             var a=Math.random(); // параметр регулирует интенсивность появления машины
             var b=Math.random(); // параметр регулирует размер машины
             if (a>0.1) {
                 parkingController.addCar(new RandomCar(b<0.5?Size.big:Size.small)) ;
+                if (b<0.5)
+                    System.out.println("Big CAR");
+                else
+                    System.out.println("Small CAR");
             }else{
-                System.out.println("No Car arrived");}
+                System.out.println("No Car arrived");
+            }
            parkingController.parkingWorking();
-
+           parkingController.calcPlaces().dispalyInfo();
+            TestProvider tp=parkingController.calcPlaces();
+            assert(tp.placeQuiantity==P);
+           // System.out.println("ok");
         }
     }
 }
@@ -37,13 +46,13 @@ public class MainClass {
 class RandomCar extends CarModel{ // машина которая будет уезжать по равномерному случайному закону
     RandomCar(Size s){
         super(s);
-        System.out.println(s.toString()+"  CAR");
+      //  System.out.println(s.toString()+"  CAR");
     };
 
     @Override
     public boolean isLeaving() {
         var a=Math.random();
-        return a>=0.8?true:false;
+        return a>=0.99?true:false;
 
     }
 }
@@ -53,7 +62,7 @@ class SizeCreator implements ParkingCreationOrder{  //определяет за�
     @Override
     public Size sizeCreator(){
         var a=Math.random();
-        return a<0.4?Size.big:Size.small;
+        return a<0.5?Size.big:Size.small;
 
     }
 }
